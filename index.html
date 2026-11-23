@@ -8,10 +8,25 @@
 <body>
   <main class="page">
     <header class="header">
-      <h1 class="header__title">Покупатели</h1>
+      <div class="header__title-group">
+        <h1 class="header__title">Покупатели</h1>
+        <span class="header__count" id="recordCountLabel"></span>
+      </div>
     </header>
     <section class="table-section" aria-label="Таблица записей покупателей">
-      <table class="buyers-table" id="buyersTable"></table>
+      <div class="table-section__wrapper">
+        <table class="buyers-table" id="buyersTable">
+          <thead class="buyers-table__head">
+            <tr class="buyers-table__row">
+              <th>Фамилия</th><th>Имя</th><th>Отчество</th><th>Пол</th><th>Национальность</th>
+              <th>Рост (см)</th><th>Вес (кг)</th><th>Дата рождения</th><th>Телефон</th>
+              <th>Индекс</th><th>Страна</th><th>Область</th><th>Район</th><th>Город</th>
+              <th>Улица</th><th>Дом</th><th>Кв.</th><th>№ кредитной карты</th><th>Банковский счёт</th>
+            </tr>
+          </thead>
+          <tbody class="buyers-table__body" id="tableBody"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 </body>
