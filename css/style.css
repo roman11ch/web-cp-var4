@@ -1,0 +1,21 @@
+:root {
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --sky-50: #F0F9FF;
+  --sky-100: #E0F2FE;
+  --sky-200: #BAE6FD;
+  --sky-500: #0EA5E9;
+  --sky-600: #0284C7;
+  --sky-700: #0369A1;
+  --border: #CBD5E1;
+  --text: #0F172A;
+  --text-muted: #475569;
+  --danger: #DC2626;
+  --radius: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 24px; font-family: sans-serif; font-size: 14px; color: var(--text); background: var(--bg); }
+.page { max-width: 1440px; margin: 0 auto; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.header__title { margin: 0; font-size: 18px; font-weight: 600; }
