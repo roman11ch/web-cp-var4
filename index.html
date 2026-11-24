@@ -14,16 +14,71 @@
         <h1 class="header__title">Покупатели</h1>
         <span class="header__count" id="recordCountLabel"></span>
       </div>
+
+      <div class="header__controls">
+        <div class="search" role="search">
+          <input
+            type="text"
+            class="search__input"
+            id="searchQuery"
+            placeholder="Поиск..."
+            aria-label="Поиск по таблице"
+          />
+          <button
+            type="button"
+            class="search__clear"
+            id="btnClearSearch"
+            title="Очистить"
+            aria-label="Очистить"
+          >&times;</button>
+        </div>
+
+        <div class="add-menu">
+          <button type="button" class="button button--primary" id="btnAdd">Добавить</button>
+          <div class="add-menu__dropdown">
+            <button type="button" class="add-menu__item" id="btnBatch">Добавить несколько</button>
+          </div>
+        </div>
+
+        <button type="button" class="button button--danger" id="btnDeleteSelected" disabled>
+          Удалить (<span id="selectedCount">0</span>)
+        </button>
+      </div>
     </header>
+
     <section class="table-section" aria-label="Таблица записей покупателей">
       <div class="table-section__wrapper">
         <table class="buyers-table" id="buyersTable">
           <thead class="buyers-table__head">
             <tr class="buyers-table__row">
-              <th>Фамилия</th><th>Имя</th><th>Отчество</th><th>Пол</th><th>Национальность</th>
-              <th>Рост (см)</th><th>Вес (кг)</th><th>Дата рождения</th><th>Телефон</th>
-              <th>Индекс</th><th>Страна</th><th>Область</th><th>Район</th><th>Город</th>
-              <th>Улица</th><th>Дом</th><th>Кв.</th><th>№ кредитной карты</th><th>Банковский счёт</th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--checkbox">
+                <input
+                  type="checkbox"
+                  class="buyers-table__checkbox"
+                  id="selectAll"
+                  title="Выделить все"
+                  aria-label="Выделить все записи"
+                />
+              </th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="lastName">Фамилия<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="firstName">Имя<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="middleName">Отчество<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="gender">Пол<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="nationality">Национальность<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="height">Рост (см)<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="weight">Вес (кг)<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="birthDate">Дата рождения<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="phone">Телефон<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="postalCode">Индекс<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="country">Страна<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="region">Область<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="district">Район<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="city">Город<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="street">Улица<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="house">Дом<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="apartment">Кв.<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="cardNumber">№ кредитной карты<span class="buyers-table__sort-icon"></span></th>
+              <th class="buyers-table__header-cell buyers-table__header-cell--sortable" data-sort="bankAccount">Банковский счёт<span class="buyers-table__sort-icon"></span></th>
             </tr>
           </thead>
           <tbody class="buyers-table__body" id="tableBody"></tbody>
@@ -31,5 +86,160 @@
       </div>
     </section>
   </main>
+
+  <section class="modal" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal__dialog">
+      <header class="modal__header">
+        <h2 class="modal__title" id="modalTitle">Новая запись «Покупатель»</h2>
+        <button type="button" class="modal__close" id="btnCloseModal" aria-label="Закрыть окно">&times;</button>
+      </header>
+
+      <div class="modal__body">
+        <form class="form" id="buyerForm" novalidate>
+          <fieldset class="form__fieldset">
+            <legend class="form__legend">Личные данные</legend>
+            <div class="form__grid">
+              <div class="form__field">
+                <label class="form__label" for="fLastName">Фамилия *</label>
+                <input class="form__input" type="text" id="fLastName" required placeholder="Иванов" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fFirstName">Имя *</label>
+                <input class="form__input" type="text" id="fFirstName" required placeholder="Алексей" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fMiddleName">Отчество</label>
+                <input class="form__input" type="text" id="fMiddleName" placeholder="Сергеевич" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fGender">Пол</label>
+                <select class="form__select" id="fGender">
+                  <option value="Мужской">Мужской</option>
+                  <option value="Женский">Женский</option>
+                </select>
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fNationality">Национальность</label>
+                <input class="form__input" type="text" id="fNationality" placeholder="Русский" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fPhone">Номер телефона *</label>
+                <input class="form__input" type="text" id="fPhone" required placeholder="+7 (999) 123-45-67" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fHeight">Рост (см)</label>
+                <input class="form__input" type="number" id="fHeight" min="50" max="250" placeholder="178" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fWeight">Вес (кг)</label>
+                <input class="form__input" type="number" id="fWeight" min="20" max="300" placeholder="74" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fBirthDate">Дата рождения</label>
+                <input class="form__input" type="date" id="fBirthDate" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form__fieldset">
+            <legend class="form__legend">Домашний адрес</legend>
+            <div class="form__grid">
+              <div class="form__field">
+                <label class="form__label" for="fPostalCode">Почтовый индекс</label>
+                <input class="form__input" type="text" id="fPostalCode" placeholder="101000" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fCountry">Страна</label>
+                <input class="form__input" type="text" id="fCountry" placeholder="Россия" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fRegion">Область</label>
+                <input class="form__input" type="text" id="fRegion" placeholder="Московская" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fDistrict">Район</label>
+                <input class="form__input" type="text" id="fDistrict" placeholder="Центральный" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fCity">Город</label>
+                <input class="form__input" type="text" id="fCity" placeholder="Москва" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fStreet">Улица</label>
+                <input class="form__input" type="text" id="fStreet" placeholder="Тверская" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fHouse">Дом</label>
+                <input class="form__input" type="text" id="fHouse" placeholder="12" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fApartment">Квартира</label>
+                <input class="form__input" type="text" id="fApartment" placeholder="45" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form__fieldset">
+            <legend class="form__legend">Платёжные реквизиты</legend>
+            <div class="form__grid">
+              <div class="form__field">
+                <label class="form__label" for="fCardNumber">Номер кредитной карточки</label>
+                <input class="form__input" type="text" id="fCardNumber" placeholder="4276 3800 1234 5678" />
+              </div>
+              <div class="form__field">
+                <label class="form__label" for="fBankAccount">Номер банковского счёта</label>
+                <input class="form__input" type="text" id="fBankAccount" placeholder="40817810099910004321" />
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <footer class="modal__footer">
+        <div class="modal__batch-note" id="batchNote"></div>
+        <div class="modal__actions">
+          <button type="button" class="button" id="btnCancelModal">Отмена</button>
+          <button type="button" class="button" id="btnSaveAndNext">Сохранить и добавить ещё</button>
+          <button type="button" class="button button--primary" id="btnSaveRecord">Сохранить</button>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+  <section class="modal" id="batchModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="batchModalTitle">
+    <div class="modal__dialog modal__dialog--narrow">
+      <header class="modal__header">
+        <h2 class="modal__title" id="batchModalTitle">Формирование массива объектов</h2>
+        <button type="button" class="modal__close" id="btnCloseBatchModal" aria-label="Закрыть">&times;</button>
+      </header>
+
+      <div class="modal__body">
+        <p class="form__description">
+          Укажите, сколько записей нужно добавить подряд в новом массиве (текущий массив можно дополнить или заменить).
+        </p>
+        <div class="form__field form__field--spaced">
+          <label class="form__label" for="batchCountInput">Количество записей (N)</label>
+          <input class="form__input" type="number" id="batchCountInput" min="1" max="20" value="3" />
+        </div>
+        <div class="form__field">
+          <label class="form__label" for="batchModeSelect">Режим</label>
+          <select class="form__select" id="batchModeSelect">
+            <option value="replace">Сформировать новый массив (очистить старый)</option>
+            <option value="append">Дополнить текущий массив</option>
+          </select>
+        </div>
+      </div>
+
+      <footer class="modal__footer">
+        <div></div>
+        <div class="modal__actions">
+          <button type="button" class="button" id="btnCancelBatch">Отмена</button>
+          <button type="button" class="button button--primary" id="btnStartBatch">Начать ввод</button>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+  <aside class="toast" id="toast" role="status" aria-live="polite"></aside>
 </body>
 </html>
