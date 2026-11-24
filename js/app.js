@@ -1,3 +1,4 @@
+const STORAGE_KEY = 'buyers_db_v4_records';
 const DEMO_BUYERS = [
   { id: 'b-1', lastName: 'Соколов', firstName: 'Дмитрий', middleName: 'Андреевич', gender: 'Мужской', nationality: 'Русский', height: 181, weight: 78, birthYear: 1998, birthMonth: 4, birthDay: 14, phone: '+7 (916) 442-18-90', postalCode: '125009', country: 'Россия', region: 'Московская', district: 'Тверской', city: 'Москва', street: 'Тверская', house: '14', apartment: '32', cardNumber: '2202 2061 4412 8801', bankAccount: '40817810200014589012' }
 ];
@@ -17,4 +18,17 @@ function viewArray() {
     tbody.appendChild(tr);
   });
 }
+viewArray();
+
+function saveToStorage() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(buyers)); } catch (e) {}
+}
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const parsed = JSON.parse(raw); if (Array.isArray(parsed)) { buyers = parsed; return; } }
+  } catch (e) {}
+  saveToStorage();
+}
+loadFromStorage();
 viewArray();
