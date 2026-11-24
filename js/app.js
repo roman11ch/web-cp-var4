@@ -413,10 +413,21 @@ function handleSave(keepOpen) {
 }
 
 
+function formArray(count, mode) {
+  if (mode === 'replace') { buyers = []; selectedIds.clear(); saveToStorage(); viewArray(); }
+  batchTotal = count; batchRemaining = count;
+  document.getElementById('batchModalBackdrop').classList.remove('modal--open');
+  openAddModal(true);
+}
 document.getElementById('btnAdd').addEventListener('click', () => openAddModal(false));
 document.getElementById('btnCloseModal').addEventListener('click', closeAddModal);
 document.getElementById('btnCancelModal').addEventListener('click', closeAddModal);
 document.getElementById('btnSaveRecord').addEventListener('click', () => handleSave(false));
 document.getElementById('btnSaveAndNext').addEventListener('click', () => handleSave(true));
+document.getElementById('btnBatch').addEventListener('click', () => document.getElementById('batchModalBackdrop').classList.add('modal--open'));
+document.getElementById('btnStartBatch').addEventListener('click', () => {
+  const count = Math.max(1, Math.min(20, Number(document.getElementById('batchCountInput').value) || 1));
+  formArray(count, document.getElementById('batchModeSelect').value);
+});
 loadFromStorage();
 viewArray();
