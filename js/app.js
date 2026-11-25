@@ -437,3 +437,14 @@ document.getElementById('btnClearSearch').addEventListener('click', () => {
   document.getElementById('searchQuery').value = '';
   viewArray();
 });
+
+document.querySelectorAll('.buyers-table__header-cell--sortable').forEach((th) => {
+  th.addEventListener('click', () => {
+    const field = th.dataset.sort;
+    currentSort.dir = currentSort.field === field && currentSort.dir === 'asc' ? 'desc' : 'asc';
+    currentSort.field = field;
+    updateSortHeaders();
+    viewArray();
+  });
+});
+updateSortHeaders();
