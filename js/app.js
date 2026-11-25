@@ -412,25 +412,101 @@ function handleSave(keepOpen) {
   }
 }
 
-
+// 1. Функция формирования массива объектов
 function formArray(count, mode) {
-  if (mode === 'replace') { buyers = []; selectedIds.clear(); saveToStorage(); viewArray(); }
-  batchTotal = count; batchRemaining = count;
+  if (mode === 'replace') {
+    buyers = [];
+    selectedIds.clear();
+    saveToStorage();
+    viewArray();
+  }
+  batchTotal = count;
+  batchRemaining = count;
   document.getElementById('batchModalBackdrop').classList.remove('modal--open');
   openAddModal(true);
 }
+
+function initColumnResizers() {
+  const defaultWidths = [
+    40, 120, 110, 125, 95, 135, 90, 85, 130, 155,
+    85, 100, 135, 125, 135, 140, 75, 70, 175, 195
+  ];
+  const headers = document.querySelectorAll('#buyersTable .buyers-table__header-cell');
+  headers.forEach((th, idx) => {
+    if (defaultWidths[idx]) {
+      th.style.width = `${defaultWidths[idx]}px`;
+    }
+    if (th.classList.contains('buyers-table__header-cell--checkbox')) return;
+
+    const resizer = document.createElement('div');
+    resizer.className = 'buyers-table__resizer';
+    th.appendChild(resizer);
+
+    let startX = 0;
+    let startWidth = 0;
+
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      startX = e.clientX;
+      startWidth = th.offsetWidth;
+      resizer.classList.add('buyers-table__resizer--active');
+      document.body.style.cursor = 'col-resize';
+
+      const onMouseMove = (moveEvent) => {
+        const newWidth = Math.max(55, startWidth + (moveEvent.clientX - startX));
+        th.style.width = `${newWidth}px`;
+      };
+
+      const onMouseUp = () => {
+        resizer.classList.remove('buyers-table__resizer--active');
+        document.body.style.cursor = '';
+        justResized = true;
+        setTimeout(() => { justResized = false; }, 120);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+}
+
+// Bindings
 document.getElementById('btnAdd').addEventListener('click', () => openAddModal(false));
 document.getElementById('btnCloseModal').addEventListener('click', closeAddModal);
 document.getElementById('btnCancelModal').addEventListener('click', closeAddModal);
 document.getElementById('btnSaveRecord').addEventListener('click', () => handleSave(false));
 document.getElementById('btnSaveAndNext').addEventListener('click', () => handleSave(true));
-document.getElementById('btnBatch').addEventListener('click', () => document.getElementById('batchModalBackdrop').classList.add('modal--open'));
+
+document.getElementById('btnBatch').addEventListener('click', () => {
+  document.getElementById('batchModalBackdrop').classList.add('modal--open');
+});
+document.getElementById('btnCloseBatchModal').addEventListener('click', () => {
+  document.getElementById('batchModalBackdrop').classList.remove('modal--open');
+});
+document.getElementById('btnCancelBatch').addEventListener('click', () => {
+  document.getElementById('batchModalBackdrop').classList.remove('modal--open');
+});
 document.getElementById('btnStartBatch').addEventListener('click', () => {
   const count = Math.max(1, Math.min(20, Number(document.getElementById('batchCountInput').value) || 1));
-  formArray(count, document.getElementById('batchModeSelect').value);
+  const mode = document.getElementById('batchModeSelect').value;
+  formArray(count, mode);
 });
-loadFromStorage();
-viewArray();
+
+document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelectedRecords);
+
+document.getElementById('selectAll').addEventListener('change', (e) => {
+  const query = document.getElementById('searchQuery').value;
+  const visible = searchByProperty(buyers, query);
+  if (e.target.checked) {
+    visible.forEach((item) => selectedIds.add(item.id));
+  } else {
+    visible.forEach((item) => selectedIds.delete(item.id));
+  }
+  viewArray();
+});
 
 document.getElementById('searchQuery').addEventListener('input', viewArray);
 document.getElementById('btnClearSearch').addEventListener('click', () => {
@@ -440,18 +516,38 @@ document.getElementById('btnClearSearch').addEventListener('click', () => {
 
 document.querySelectorAll('.buyers-table__header-cell--sortable').forEach((th) => {
   th.addEventListener('click', () => {
+    if (justResized) return;
     const field = th.dataset.sort;
-    currentSort.dir = currentSort.field === field && currentSort.dir === 'asc' ? 'desc' : 'asc';
-    currentSort.field = field;
+    if (currentSort.field === field) {
+      currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSort.field = field;
+      currentSort.dir = 'asc';
+    }
     updateSortHeaders();
     viewArray();
   });
 });
-updateSortHeaders();
 
-document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelectedRecords);
-document.getElementById('selectAll').addEventListener('change', (e) => {
-  const visible = searchByProperty(buyers, document.getElementById('searchQuery').value);
-  visible.forEach((item) => e.target.checked ? selectedIds.add(item.id) : selectedIds.delete(item.id));
-  viewArray();
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAddModal();
+    document.getElementById('batchModalBackdrop').classList.remove('modal--open');
+  }
 });
+
+document.getElementById('modalBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'modalBackdrop') closeAddModal();
+});
+
+document.getElementById('batchModalBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'batchModalBackdrop') {
+    document.getElementById('batchModalBackdrop').classList.remove('modal--open');
+  }
+});
+
+// Init
+loadFromStorage();
+initColumnResizers();
+updateSortHeaders();
+viewArray();
