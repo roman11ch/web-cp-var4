@@ -448,3 +448,10 @@ document.querySelectorAll('.buyers-table__header-cell--sortable').forEach((th) =
   });
 });
 updateSortHeaders();
+
+document.getElementById('btnDeleteSelected').addEventListener('click', deleteSelectedRecords);
+document.getElementById('selectAll').addEventListener('change', (e) => {
+  const visible = searchByProperty(buyers, document.getElementById('searchQuery').value);
+  visible.forEach((item) => e.target.checked ? selectedIds.add(item.id) : selectedIds.delete(item.id));
+  viewArray();
+});
