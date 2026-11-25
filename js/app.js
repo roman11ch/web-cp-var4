@@ -431,3 +431,9 @@ document.getElementById('btnStartBatch').addEventListener('click', () => {
 });
 loadFromStorage();
 viewArray();
+
+document.getElementById('searchQuery').addEventListener('input', viewArray);
+document.getElementById('btnClearSearch').addEventListener('click', () => {
+  document.getElementById('searchQuery').value = '';
+  viewArray();
+});
